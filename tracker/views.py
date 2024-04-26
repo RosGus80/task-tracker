@@ -2,6 +2,7 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
 from tracker.models import Employee, Task
+from tracker.paginators import BasePaginator
 from tracker.serializers import TaskCreateSerializer, EmployeeCreateSerializer, EmployeeRetrieveSerializer, \
     TaskRetrieveSerializer
 
@@ -12,6 +13,7 @@ from tracker.serializers import TaskCreateSerializer, EmployeeCreateSerializer, 
 # Вьюшки модели сотрудника
 
 class EmployeeCreateAPIView(generics.CreateAPIView):
+    """Эндпойнт создания сотрудника. Требует аутентификации."""
     queryset = Employee.objects.all()
     serializer_class = EmployeeCreateSerializer
     permission_classes = [IsAuthenticated]
@@ -23,6 +25,7 @@ class EmployeeCreateAPIView(generics.CreateAPIView):
 
 
 class EmployeeRetrieveAPIView(generics.RetrieveAPIView):
+    """Эндпойнт просмотра сотрудника по айди, который передается в ссылке. Требует аутентификации."""
     serializer_class = EmployeeRetrieveSerializer
     permission_classes = [IsAuthenticated]
 
@@ -31,6 +34,7 @@ class EmployeeRetrieveAPIView(generics.RetrieveAPIView):
 
 
 class EmployeeUpdateAPIView(generics.UpdateAPIView):
+    """Эндпойнт редактирования сотрудника по айди, который передается в ссылке. Требует аутентификации."""
     serializer_class = EmployeeCreateSerializer
     permission_classes = [IsAuthenticated]
 
@@ -39,6 +43,7 @@ class EmployeeUpdateAPIView(generics.UpdateAPIView):
 
 
 class EmployeeDestroyAPIView(generics.DestroyAPIView):
+    """Эндпойнт удаления сотрудника по айди, который передается в ссылке. Требует аутентификации."""
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -46,7 +51,9 @@ class EmployeeDestroyAPIView(generics.DestroyAPIView):
 
 
 class EmployeeListAPIView(generics.ListAPIView):
+    """Эндпойнт для просмотра всех созданных вами сотрудников. Требует аутентификации."""
     serializer_class = EmployeeRetrieveSerializer
+    pagination_class = BasePaginator
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -54,6 +61,7 @@ class EmployeeListAPIView(generics.ListAPIView):
 
 
 class TaskCreateAPIView(generics.CreateAPIView):
+    """Эндпойнт создания задачи. Требует аутентификации."""
     serializer_class = TaskCreateSerializer
     permission_classes = [IsAuthenticated]
 
@@ -64,6 +72,7 @@ class TaskCreateAPIView(generics.CreateAPIView):
 
 
 class TaskRetrieveAPIView(generics.RetrieveAPIView):
+    """Эндпойнт просмотра задачи по айди, который передается в ссылке. Требует аутентификации."""
     serializer_class = TaskRetrieveSerializer
     permission_classes = [IsAuthenticated]
 
@@ -72,6 +81,7 @@ class TaskRetrieveAPIView(generics.RetrieveAPIView):
 
 
 class TaskUpdateAPIView(generics.UpdateAPIView):
+    """Эндпойнт редактирования задачи по айди, который передается в ссылке. Требует аутентификации."""
     serializer_class = TaskCreateSerializer
     permission_classes = [IsAuthenticated]
 
@@ -80,6 +90,7 @@ class TaskUpdateAPIView(generics.UpdateAPIView):
 
 
 class TaskDestroyAPIView(generics.DestroyAPIView):
+    """Эндпойнт удаления задачи по айди, который передается в ссылке. Требует аутентификации."""
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -87,8 +98,20 @@ class TaskDestroyAPIView(generics.DestroyAPIView):
 
 
 class TaskListAPIView(generics.ListAPIView):
+    """Эндпойнт для просмотра всех созданных вами задач. Требует аутентификации."""
     serializer_class = TaskRetrieveSerializer
+    pagination_class = BasePaginator
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Task.objects.filter(owner=self.request.user)
+
+
+class FreeEmployeesListAPIView(generics.ListAPIView):
+    """Эндпойнт для просмотра всех ваших сотрудников, отфильтрованный по их занятости. Требует аутентификации."""
+    serializer_class = EmployeeRetrieveSerializer
+    pagination_class = BasePaginator
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Employee.objects.exclude(owner=self.request.user)
