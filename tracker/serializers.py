@@ -24,6 +24,10 @@ class EmployeeRetrieveSerializer(serializers.ModelSerializer):
 
 
 class EmployeeForTaskSerializer(serializers.ModelSerializer):
+    """Сериализатор для отображения сотрудников при сериализации их задач.
+    Создан, чтобы избежать обращения сериализатора задач к самому себе,
+    как при использовании EmployeeRetrieveSerializer"""
+
     class Meta:
         model = Employee
         fields = ('id', 'name', 'position')
@@ -43,5 +47,3 @@ class TaskRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = '__all__'
-
-
