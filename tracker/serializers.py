@@ -14,9 +14,17 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
 class EmployeeRetrieveSerializer(serializers.ModelSerializer):
     owner = UserSerializer(read_only=True)
     tasks = serializers.SerializerMethodField()
+    pending_tasks = serializers.SerializerMethodField()
 
     def get_tasks(self, obj):
-        return Task.objects.filter(employee=obj)
+        queryset = Task.objects.filter(employee=obj)
+        task_list = []
+        for task in queryset:
+            task_list.append({'pk': task.pk, 'name': task.name, 'is_completed': task.is_completed})
+        return task_list
+
+    def get_pending_tasks(self, obj):
+        return Task.objects.filter(employee=obj, is_completed=False).count()
 
     class Meta:
         model = Employee

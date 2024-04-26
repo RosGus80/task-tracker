@@ -108,10 +108,38 @@ class TaskListAPIView(generics.ListAPIView):
 
 
 class FreeEmployeesListAPIView(generics.ListAPIView):
-    """Эндпойнт для просмотра всех ваших сотрудников, отфильтрованный по их занятости. Требует аутентификации."""
+    """Эндпойнт для просмотра всех ваших сотрудников, отфильтрованный по их занятости (наиболее свободные впереди).
+    Требует аутентификации."""
     serializer_class = EmployeeRetrieveSerializer
     pagination_class = BasePaginator
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Employee.objects.exclude(owner=self.request.user)
+        """Возвращает список сотрудников авторизованного пользователя, сортируя по количеству приписанных к ним задач
+        и выводя самых менее нагруженных вперед"""
+
+        """К сожалению, я не смог встроенными средствами джанго реализовать фильтрацию. Моя лучшая попытка - 
+        закомментированный ниже код. Оставил его на случай, если смогу доработать. Его проблема заключается в том, что
+        он считает все задачи, приписанные работнику, но он не должен считать выполненные задачи, но отфильтровать
+        выполненные задачи от невыполененных я не смог, поэтому создал алгоритм получения отфильтрованного кверисета."""
+        # return Employee.objects.filter(owner=self.request.user).\
+        #     annotate(num_tasks=Count('task')).order_by('num_tasks')
+
+        query = Employee.objects.filter(owner=self.request.user)  # Получаем кверисет всех сотрудников пользователя
+        emp_dict = {}  # Создаем словарь, который заполним парой (сотрудник: количество невыполненных задач)
+        for emp in query:  # Для каждого сотрудника в кверисете найдем количество невыполненных задач
+            emp_tasks = Task.objects.filter(employee=emp)  # Среди задач находим задачи сотрудника
+            emp_pending = 0
+            for task in emp_tasks:
+                if task.is_completed is False:
+                    emp_pending += 1  # Добавляем 1 к числу невыполненных задач
+            emp_dict[emp] = emp_pending  # Добавляем пару: ключ = сотрудник, значение = кол-во невыполненных задач
+
+        sorted_dict = {k: v for k, v in sorted(emp_dict.items(), key=lambda item: item[1])}  # Сортируем по кол-ву задач
+        output = list(sorted_dict.keys())  # Оставляем от словаря только отсортированный список ключей (сотрудников)
+        return output
+
+
+class ImportantTasksListAPView(generics.ListAPIView):
+    pass
+
