@@ -2,7 +2,7 @@ from django.urls import path
 
 from tracker.views import EmployeeCreateAPIView, EmployeeRetrieveAPIView, EmployeeUpdateAPIView, EmployeeDestroyAPIView, \
     EmployeeListAPIView, TaskCreateAPIView, TaskRetrieveAPIView, TaskUpdateAPIView, TaskDestroyAPIView, TaskListAPIView, \
-    FreeEmployeesListAPIView
+    FreeEmployeesListAPIView, ImportantTasksListAPIView
 
 app_name = 'api'
 
@@ -22,4 +22,6 @@ urlpatterns = [
     path('task_update/<int:pk>', TaskUpdateAPIView.as_view(), name='task_update'),
     path('task_destroy/<int:pk>', TaskDestroyAPIView.as_view(), name='task_destroy'),
     path('task_list/', TaskListAPIView.as_view(), name='task_list'),
+    
+    path('important_tasks/', ImportantTasksListAPIView.as_view(), name='important_tasks_list'),
 ]
