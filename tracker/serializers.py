@@ -48,6 +48,24 @@ class TaskCreateSerializer(serializers.ModelSerializer):
         exclude = ('owner', )
 
 
+    def validate(self, attrs):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+
+        parent_task = attrs.get('parent_task')
+        employee = attrs.get('employee')
+
+        if parent_task is not None:
+            if parent_task.owner != user:
+                raise serializers.ValidationError('Указанная родительская задача не принадлежит вам')
+        if employee is not None:
+            if employee.owner != user:
+                raise serializers.ValidationError('Указанный сотрудник не принадлежит вам')
+        return super(TaskCreateSerializer, self).validate(attrs)
+
+
 class TaskRetrieveSerializer(serializers.ModelSerializer):
     owner = UserSerializer(read_only=True)
     employee = EmployeeForTaskSerializer(read_only=True)

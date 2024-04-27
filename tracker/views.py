@@ -106,7 +106,7 @@ class TaskListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Task.objects.filter(owner=self.request.user)
+        return Task.objects.filter(owner=self.request.user).order_by('pk')
 
 
 class FreeEmployeesListAPIView(generics.ListAPIView):
@@ -204,6 +204,7 @@ class ImportantTasksListAPIView(APIView):
 
         output = []
         pair_num = 0
+        # Вручную генерируем вывод
         for k, v in new_tasks_emps.items():
             pair_num += 1
             task_output = {'pk': k.pk, 'name': k.name, 'parent_task': k.parent_task.pk}
