@@ -149,7 +149,7 @@ class ImportantTasksListAPIView(APIView):
         # Задачи, не принятые в работу
         important_tasks_queryset = []
         for task in tasks_queryset:
-            sub_tasks = Task.objects.filter(parent_task=task).exclude(is_completed=True)
+            sub_tasks = Task.objects.filter(parent_task=task).exclude(employee=None, is_completed=True)
             # Дочерние задачи в работе
             if len(sub_tasks) > 0:
                 important_tasks_queryset.append(task)
@@ -206,7 +206,7 @@ class ImportantTasksListAPIView(APIView):
         pair_num = 0
         for k, v in new_tasks_emps.items():
             pair_num += 1
-            task_output = {'pk': k.pk, 'name': k.name, 'parent_task': k.parent_task}
+            task_output = {'pk': k.pk, 'name': k.name, 'parent_task': k.parent_task.pk}
             employee_output = {'pk': v.pk, 'name': v.name, 'position': v.position}
             output.append({'pair_num': pair_num, 'task': task_output, 'employee': employee_output, 'due_to': k.due_to})
 
