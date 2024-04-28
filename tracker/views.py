@@ -207,7 +207,7 @@ class ImportantTasksListAPIView(APIView):
         # Вручную генерируем вывод
         for k, v in new_tasks_emps.items():
             pair_num += 1
-            task_output = {'pk': k.pk, 'name': k.name, 'parent_task': k.parent_task.pk}
+            task_output = {'pk': k.pk, 'name': k.name}
             employee_output = {'pk': v.pk, 'name': v.name, 'position': v.position}
             output.append({'pair_num': pair_num, 'task': task_output, 'employee': employee_output, 'due_to': k.due_to})
 
